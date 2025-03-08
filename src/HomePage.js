@@ -47,12 +47,6 @@ const HomePage = () => {
       newErrors.size = 'Tamanho da organização é obrigatório';
     }
     
-    if (!organizationInfo.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(organizationInfo.email)) {
-      newErrors.email = 'Email inválido';
-    }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

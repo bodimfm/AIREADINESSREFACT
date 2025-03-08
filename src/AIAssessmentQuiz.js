@@ -4,8 +4,7 @@ import {
   PolarGrid, 
   PolarAngleAxis, 
   PolarRadiusAxis, 
-  Radar, 
-  Legend, 
+  Radar,  
   ResponsiveContainer,
   Tooltip
 } from 'recharts';
@@ -258,7 +257,7 @@ const AIAssessmentQuiz = () => {
     const formData = {
       // Dados de contato
       name: contactInfo.name,
-      email: contactInfo.email,
+      email: contactInfo.email || "N/A",
       company: contactInfo.company,
       position: contactInfo.position,
       
@@ -344,7 +343,7 @@ const AIAssessmentQuiz = () => {
             
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                E-mail <span className="text-red-500">*</span>
+                E-mail
               </label>
               <input
                 type="email"
@@ -353,7 +352,6 @@ const AIAssessmentQuiz = () => {
                 value={contactInfo.email}
                 onChange={handleContactChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
               />
             </div>
             
@@ -391,9 +389,9 @@ const AIAssessmentQuiz = () => {
           <div className="mt-6">
             <button
               onClick={submitToFormspree}
-              disabled={submitStatus === "submitting" || !contactInfo.name || !contactInfo.email || !contactInfo.company || !contactInfo.position}
+              disabled={submitStatus === "submitting" || !contactInfo.name || !contactInfo.company || !contactInfo.position}
               className={`w-full px-4 py-2 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-                ${(submitStatus === "submitting" || !contactInfo.name || !contactInfo.email || !contactInfo.company || !contactInfo.position) 
+                ${(submitStatus === "submitting" || !contactInfo.name || !contactInfo.company || !contactInfo.position) 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-blue-600 hover:bg-blue-700'}`}
             >
