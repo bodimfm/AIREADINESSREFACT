@@ -1,45 +1,110 @@
-// questions.js
+// Perguntas para a avaliação de maturidade em IA
 export const questions = [
-    // Perguntas da Dimensão Business
-    { id: 1, dimension: "Business", text: "Nossa organização definiu claramente metas estratégicas de negócios para a IA." },
-    { id: 2, dimension: "Business", text: "Nossas iniciativas de IA estão bem alinhadas para apoiar e aprimorar nossa estratégia geral de negócios." },
-    { id: 3, dimension: "Business", text: "Identificamos desafios e oportunidades específicas de negócios que podem ser melhoradas com IA." },
-    { id: 4, dimension: "Business", text: "Acreditamos que a IA proporcionará uma vantagem competitiva e impulsionará a inovação em nosso modelo de negócios." },
-    { id: 5, dimension: "Business", text: "Estabelecemos critérios claros para definir o sucesso das implementações de IA em nossa organização." },
-    { id: 6, dimension: "Business", text: "As soluções de IA propostas estão alinhadas com nossas iniciativas comerciais atuais ou futuras." },
-    { id: 7, dimension: "Business", text: "Definimos uma data realista para quando nossas iniciativas de IA estarão operacionais, incluindo marcos-chave." },
-    { id: 8, dimension: "Business", text: "Temos um sistema em vigor para revisar periodicamente a eficácia e o alinhamento estratégico das iniciativas de IA." },
-    { id: 9, dimension: "Business", text: "Estimamos com precisão os investimentos financeiros e de recursos humanos necessários para nossa estratégia de IA." },
-    { id: 10, dimension: "Business", text: "Estamos confiantes de que a IA melhorará nossa posição competitiva no mercado." },
-    
-    // Perguntas da Dimensão Dados
-    { id: 11, dimension: "Data", text: "Definimos e implementamos medidas para garantir a precisão dos dados com benchmarks claros." },
-    { id: 12, dimension: "Data", text: "Nossos procedimentos para avaliar a completude dos dados são rigorosos e eficazes." },
-    { id: 13, dimension: "Data", text: "Estabelecemos critérios para avaliar a relevância dos dados para nossas aplicações específicas de IA." },
-    { id: 14, dimension: "Data", text: "Avaliações de qualidade dos dados são conduzidas em frequência apropriada para garantir a integridade dos dados." },
-    { id: 15, dimension: "Data", text: "Temos processos para gerenciar e corrigir eficientemente dados faltantes ou incompletos." },
-    
-    // Perguntas da Dimensão Planejamento de Orçamento e Recursos
-    { id: 16, dimension: "Financial", text: "Temos um orçamento bem definido especificamente alocado para a implementação inicial de IA." },
-    { id: 17, dimension: "Financial", text: "Temos um sistema confiável de previsão para os custos operacionais contínuos das iniciativas de IA." },
-    { id: 18, dimension: "Financial", text: "Recursos financeiros suficientes são alocados para pesquisa e desenvolvimento em IA." },
-    { id: 19, dimension: "Financial", text: "Nosso orçamento está projetado para escalar conforme o crescimento dos projetos de IA." },
-    { id: 20, dimension: "Financial", text: "Ajustamos regularmente o orçamento dos projetos de IA com base nas métricas de desempenho." },
-    { id: 21, dimension: "Financial", text: "As economias das iniciativas de IA são realocadas eficientemente dentro da nossa organização." },
-    { id: 22, dimension: "Financial", text: "Estratégias robustas de gestão de riscos financeiros estão implementadas para nossos investimentos em IA." },
-    { id: 23, dimension: "Financial", text: "Nosso orçamento de IA está alinhado estrategicamente com os objetivos gerais da organização." },
-    { id: 24, dimension: "Financial", text: "Reservamos fundos de contingência para despesas inesperadas relacionadas à IA." },
-    { id: 25, dimension: "Financial", text: "Nossos processos de rastreamento e relatórios de custos para projetos de IA são detalhados e transparentes." },
-    
-    // Perguntas da Dimensão IA Ética e Impacto Social
-    { id: 26, dimension: "Ethics", text: "Nossa organização estabeleceu princípios éticos claros para o desenvolvimento de IA." },
-    { id: 27, dimension: "Ethics", text: "Temos mecanismos implementados para garantir a equidade em nossos sistemas de IA." },
-    { id: 28, dimension: "Ethics", text: "Estabelecemos mecanismos de responsabilidade para decisões tomadas por nossos sistemas de IA." },
-    { id: 29, dimension: "Ethics", text: "Nossos processos e algoritmos de IA são mantidos com alta transparência." },
-    { id: 30, dimension: "Ethics", text: "Utilizamos ativamente métodos para avaliar o impacto social de nossas tecnologias de IA." },
-    { id: 31, dimension: "Ethics", text: "Identificamos e abordamos proativamente possíveis deslocamentos de empregos devido à IA." },
-    { id: 32, dimension: "Ethics", text: "Temos procedimentos para monitorar e mitigar vieses em nossos sistemas de IA de forma eficaz." },
-    { id: 33, dimension: "Ethics", text: "Práticas de sustentabilidade estão integradas ao nosso ciclo de desenvolvimento de IA." },
-    { id: 34, dimension: "Ethics", text: "Medimos os efeitos sociais de longo prazo das nossas implementações de IA." },
-    { id: 35, dimension: "Ethics", text: "Revisamos e atualizamos regularmente nossas políticas de ética em IA." }
-  ];
+  // Dimensão: Business (Estratégia de Negócios)
+  {
+    id: 1,
+    dimension: "Business",
+    text: "Nossa organização tem uma estratégia clara para implementação de IA alinhada com os objetivos de negócio."
+  },
+  {
+    id: 2,
+    dimension: "Business",
+    text: "A liderança executiva demonstra compromisso com a adoção de IA e sua integração aos processos de negócio."
+  },
+  {
+    id: 3,
+    dimension: "Business",
+    text: "Temos um roadmap definido para implementação de iniciativas de IA."
+  },
+  {
+    id: 4,
+    dimension: "Business",
+    text: "Nossos processos de negócio são adequadamente documentados e mapeados para identificar oportunidades de aplicação de IA."
+  },
+  {
+    id: 5,
+    dimension: "Business",
+    text: "Temos KPIs claros para medir o sucesso das nossas iniciativas de IA."
+  },
+  
+  // Dimensão: Data (Gestão de Dados)
+  {
+    id: 6,
+    dimension: "Data",
+    text: "Nossa organização possui fontes de dados confiáveis e de qualidade para alimentar soluções de IA."
+  },
+  {
+    id: 7,
+    dimension: "Data",
+    text: "Temos processos estabelecidos para coleta, armazenamento e processamento de dados."
+  },
+  {
+    id: 8,
+    dimension: "Data",
+    text: "Existem políticas de governança de dados implementadas na organização."
+  },
+  {
+    id: 9,
+    dimension: "Data",
+    text: "Nossos dados estão disponíveis e acessíveis para as equipes que desenvolvem soluções de IA."
+  },
+  {
+    id: 10,
+    dimension: "Data",
+    text: "Temos infraestrutura adequada para o volume e variedade de dados necessários para aplicações de IA."
+  },
+  
+  // Dimensão: Financial (Planejamento Financeiro)
+  {
+    id: 11,
+    dimension: "Financial",
+    text: "Existe um orçamento específico alocado para iniciativas de IA."
+  },
+  {
+    id: 12,
+    dimension: "Financial",
+    text: "Realizamos análises de ROI antes de investir em projetos de IA."
+  },
+  {
+    id: 13,
+    dimension: "Financial",
+    text: "Temos processos para monitorar e otimizar os custos das iniciativas de IA."
+  },
+  {
+    id: 14,
+    dimension: "Financial",
+    text: "Nossa organização tem uma visão clara do impacto financeiro esperado das implementações de IA."
+  },
+  {
+    id: 15,
+    dimension: "Financial",
+    text: "Existe um processo de priorização de investimentos em IA baseado em critérios financeiros."
+  },
+  
+  // Dimensão: Ethics (Ética e Impacto Social)
+  {
+    id: 16,
+    dimension: "Ethics",
+    text: "Nossa organização considera aspectos éticos no desenvolvimento e implementação de soluções de IA."
+  },
+  {
+    id: 17,
+    dimension: "Ethics",
+    text: "Temos políticas estabelecidas para uso responsável de IA."
+  },
+  {
+    id: 18,
+    dimension: "Ethics",
+    text: "Realizamos avaliações de risco ético antes de implementar soluções de IA."
+  },
+  {
+    id: 19,
+    dimension: "Ethics",
+    text: "Nossas soluções de IA são desenvolvidas considerando princípios de transparência e explicabilidade."
+  },
+  {
+    id: 20,
+    dimension: "Ethics",
+    text: "A organização considera o impacto social e humano das tecnologias de IA implementadas."
+  }
+];

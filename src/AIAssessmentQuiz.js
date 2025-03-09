@@ -1,93 +1,41 @@
-import React, { useState } from 'react';
-import { 
-  RadarChart, 
-  PolarGrid, 
-  PolarAngleAxis, 
-  PolarRadiusAxis, 
-  Radar,  
-  ResponsiveContainer,
-  Tooltip
-} from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { questions } from './questions';
+import ScoreChart from './ScoreChart';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 const AIAssessmentQuiz = () => {
-  const questions = [
-    // Perguntas da Dimensão Business
-    { id: 1, dimension: "Business", text: "Nossa organização definiu claramente metas estratégicas de negócios para a IA." },
-    { id: 2, dimension: "Business", text: "Nossas iniciativas de IA estão bem alinhadas para apoiar e aprimorar nossa estratégia geral de negócios." },
-    { id: 3, dimension: "Business", text: "Identificamos desafios e oportunidades específicas de negócios que podem ser melhoradas com IA." },
-    { id: 4, dimension: "Business", text: "Acreditamos que a IA proporcionará uma vantagem competitiva e impulsionará a inovação em nosso modelo de negócios." },
-    { id: 5, dimension: "Business", text: "Estabelecemos critérios claros para definir o sucesso das implementações de IA em nossa organização." },
-    { id: 6, dimension: "Business", text: "As soluções de IA propostas estão alinhadas com nossas iniciativas comerciais atuais ou futuras." },
-    { id: 7, dimension: "Business", text: "Definimos uma data realista para quando nossas iniciativas de IA estarão operacionais, incluindo marcos-chave." },
-    { id: 8, dimension: "Business", text: "Temos um sistema em vigor para revisar periodicamente a eficácia e o alinhamento estratégico das iniciativas de IA." },
-    { id: 9, dimension: "Business", text: "Estimamos com precisão os investimentos financeiros e de recursos humanos necessários para nossa estratégia de IA." },
-    { id: 10, dimension: "Business", text: "Estamos confiantes de que a IA melhorará nossa posição competitiva no mercado." },
-    
-    // Perguntas da Dimensão Dados
-    { id: 11, dimension: "Data", text: "Definimos e implementamos medidas para garantir a precisão dos dados com benchmarks claros." },
-    { id: 12, dimension: "Data", text: "Nossos procedimentos para avaliar a completude dos dados são rigorosos e eficazes." },
-    { id: 13, dimension: "Data", text: "Estabelecemos critérios para avaliar a relevância dos dados para nossas aplicações específicas de IA." },
-    { id: 14, dimension: "Data", text: "Avaliações de qualidade dos dados são conduzidas em frequência apropriada para garantir a integridade dos dados." },
-    { id: 15, dimension: "Data", text: "Temos processos para gerenciar e corrigir eficientemente dados faltantes ou incompletos." },
-    
-    // Perguntas da Dimensão Planejamento de Orçamento e Recursos
-    { id: 16, dimension: "Financial", text: "Temos um orçamento bem definido especificamente alocado para a implementação inicial de IA." },
-    { id: 17, dimension: "Financial", text: "Temos um sistema confiável de previsão para os custos operacionais contínuos das iniciativas de IA." },
-    { id: 18, dimension: "Financial", text: "Recursos financeiros suficientes são alocados para pesquisa e desenvolvimento em IA." },
-    { id: 19, dimension: "Financial", text: "Nosso orçamento está projetado para escalar conforme o crescimento dos projetos de IA." },
-    { id: 20, dimension: "Financial", text: "Ajustamos regularmente o orçamento dos projetos de IA com base nas métricas de desempenho." },
-    { id: 21, dimension: "Financial", text: "As economias das iniciativas de IA são realocadas eficientemente dentro da nossa organização." },
-    { id: 22, dimension: "Financial", text: "Estratégias robustas de gestão de riscos financeiros estão implementadas para nossos investimentos em IA." },
-    { id: 23, dimension: "Financial", text: "Nosso orçamento de IA está alinhado estrategicamente com os objetivos gerais da organização." },
-    { id: 24, dimension: "Financial", text: "Reservamos fundos de contingência para despesas inesperadas relacionadas à IA." },
-    { id: 25, dimension: "Financial", text: "Nossos processos de rastreamento e relatórios de custos para projetos de IA são detalhados e transparentes." },
-    
-    // Perguntas da Dimensão IA Ética e Impacto Social
-    { id: 26, dimension: "Ethics", text: "Nossa organização estabeleceu princípios éticos claros para o desenvolvimento de IA." },
-    { id: 27, dimension: "Ethics", text: "Temos mecanismos implementados para garantir a equidade em nossos sistemas de IA." },
-    { id: 28, dimension: "Ethics", text: "Estabelecemos mecanismos de responsabilidade para decisões tomadas por nossos sistemas de IA." },
-    { id: 29, dimension: "Ethics", text: "Nossos processos e algoritmos de IA são mantidos com alta transparência." },
-    { id: 30, dimension: "Ethics", text: "Utilizamos ativamente métodos para avaliar o impacto social de nossas tecnologias de IA." },
-    { id: 31, dimension: "Ethics", text: "Identificamos e abordamos proativamente possíveis deslocamentos de empregos devido à IA." },
-    { id: 32, dimension: "Ethics", text: "Temos procedimentos para monitorar e mitigar vieses em nossos sistemas de IA de forma eficaz." },
-    { id: 33, dimension: "Ethics", text: "Práticas de sustentabilidade estão integradas ao nosso ciclo de desenvolvimento de IA." },
-    { id: 34, dimension: "Ethics", text: "Medimos os efeitos sociais de longo prazo das nossas implementações de IA." },
-    { id: 35, dimension: "Ethics", text: "Revisamos e atualizamos regularmente nossas políticas de ética em IA." }
-  ];
-
-  // Estado para armazenar as respostas (1-5)
+  // Estados para respostas e navegação
   const [answers, setAnswers] = useState({});
-  // Estado para controlar qual dimensão está sendo mostrada
   const [currentDimension, setCurrentDimension] = useState("Business");
-  // Estado para rastrear o progresso geral do questionário
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  // Estado para controlar se o formulário de contato está sendo mostrado
   const [showContactForm, setShowContactForm] = useState(false);
-  // Estado para controlar se o resumo está sendo mostrado
   const [showSummary, setShowSummary] = useState(false);
-  // Estado para armazenar dados de contato do usuário
+  const [transitionDirection, setTransitionDirection] = useState("next");
+  const [animating, setAnimating] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+
+  // Dados de contato
   const [contactInfo, setContactInfo] = useState({
     name: "",
     email: "",
     company: "",
     position: ""
   });
-  // Estado para controlar o status do envio para o Formspree
   const [submitStatus, setSubmitStatus] = useState("idle"); // idle, submitting, success, error
 
   // Opções de resposta (escala Likert)
   const options = [
-    { value: 1, label: "Discordo Totalmente" },
-    { value: 2, label: "Discordo" },
-    { value: 3, label: "Neutro" },
-    { value: 4, label: "Concordo" },
-    { value: 5, label: "Concordo Totalmente" }
+    { value: 1, label: "Discordo Totalmente", color: "red" },
+    { value: 2, label: "Discordo", color: "orange" },
+    { value: 3, label: "Neutro", color: "yellow" },
+    { value: 4, label: "Concordo", color: "blue" },
+    { value: 5, label: "Concordo Totalmente", color: "green" }
   ];
 
-  // Lista de todas as dimensões disponíveis
+  // Lista de dimensões e suas traduções
   const dimensions = ["Business", "Data", "Financial", "Ethics"];
-
-  // Tradução dos nomes das dimensões para português
   const dimensionTranslation = {
     "Business": "Estratégia de Negócios",
     "Data": "Gestão de Dados",
@@ -95,196 +43,209 @@ const AIAssessmentQuiz = () => {
     "Ethics": "Ética e Impacto Social"
   };
 
+  // Mapeamento de cores para dimensões
+  const dimensionColors = {
+    "Business": "#4F46E5", // Indigo
+    "Data": "#0EA5E9",     // Sky Blue
+    "Financial": "#10B981", // Emerald
+    "Ethics": "#8B5CF6"     // Violet
+  };
+
   // Filtrar perguntas pela dimensão atual
   const filteredQuestions = questions.filter(q => q.dimension === currentDimension);
+  const currentQuestion = filteredQuestions[currentQuestionIndex];
 
-  // Atualizar a resposta quando o usuário selecionar uma opção
+  // Progresso da dimensão atual (circular)
+  const dimensionProgress = ((currentQuestionIndex + 1) / filteredQuestions.length) * 100;
+
+  // Atualizar o progresso total sempre que as respostas mudarem
+  useEffect(() => {
+    const answeredCount = Object.keys(answers).length;
+    setProgress((answeredCount / questions.length) * 100);
+  }, [answers]);
+
+  // Funções de navegação
+  const nextQuestion = () => {
+    if (animating) return;
+    setAnimating(true);
+    setTransitionDirection("next");
+    setTimeout(() => {
+      const filtered = questions.filter(q => q.dimension === currentDimension);
+      if (currentQuestionIndex < filtered.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else {
+        const currentIndex = dimensions.indexOf(currentDimension);
+        if (currentIndex < dimensions.length - 1) {
+          setCurrentDimension(dimensions[currentIndex + 1]);
+          setCurrentQuestionIndex(0);
+        } else {
+          setShowContactForm(true);
+        }
+      }
+      setAnimating(false);
+    }, 300);
+  };
+
+  const prevQuestion = () => {
+    if (animating) return;
+    setAnimating(true);
+    setTransitionDirection("prev");
+    setTimeout(() => {
+      if (currentQuestionIndex > 0) {
+        setCurrentQuestionIndex(currentQuestionIndex - 1);
+      } else {
+        const currentIndex = dimensions.indexOf(currentDimension);
+        if (currentIndex > 0) {
+          const prevDimension = dimensions[currentIndex - 1];
+          const prevQuestions = questions.filter(q => q.dimension === prevDimension);
+          setCurrentDimension(prevDimension);
+          setCurrentQuestionIndex(prevQuestions.length - 1);
+        }
+      }
+      setAnimating(false);
+    }, 300);
+  };
+
+  // Atualiza a resposta e avança
   const handleAnswer = (questionId, value) => {
+    if (animating) return;
     setAnswers(prev => ({
       ...prev,
       [questionId]: value
     }));
-    
-    // Atualizar o progresso geral
     setTimeout(() => {
-      const answeredCount = Object.keys(answers).length;
-      const totalQuestions = questions.length;
-      setProgress((answeredCount / totalQuestions) * 100);
-    }, 0);
+      nextQuestion();
+    }, 500);
   };
 
-  // Atualizar os dados de contato
+  // Atualiza os dados de contato com validação
   const handleContactChange = (e) => {
     const { name, value } = e.target;
-    setContactInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Mudar para a próxima dimensão
-  const nextDimension = () => {
-    const currentIndex = dimensions.indexOf(currentDimension);
-    if (currentIndex < dimensions.length - 1) {
-      setCurrentDimension(dimensions[currentIndex + 1]);
-    } else {
-      setShowContactForm(true);
+    setContactInfo(prev => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: null }));
     }
   };
 
-  // Voltar para a dimensão anterior
-  const prevDimension = () => {
-    const currentIndex = dimensions.indexOf(currentDimension);
-    if (currentIndex > 0) {
-      setCurrentDimension(dimensions[currentIndex - 1]);
+  // Valida o formulário de contato
+  const validateContactForm = () => {
+    const errors = {};
+    if (!contactInfo.name.trim()) {
+      errors.name = "Nome é obrigatório";
     }
+    if (!contactInfo.email.trim()) {
+      errors.email = "E-mail é obrigatório";
+    } else if (!/\S+@\S+\.\S+/.test(contactInfo.email)) {
+      errors.email = "E-mail inválido";
+    }
+    if (!contactInfo.company.trim()) {
+      errors.company = "Empresa é obrigatória";
+    }
+    if (!contactInfo.position.trim()) {
+      errors.position = "Cargo é obrigatório";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  // Calcular a pontuação média para cada dimensão
+  // Calcula as pontuações (considerando 1 para perguntas não respondidas)
   const calculateScores = () => {
     const scores = {};
-    const detailedScores = {};
-    
     dimensions.forEach(dimension => {
-      const dimensionQuestions = questions.filter(q => q.dimension === dimension);
+      const dimQuestions = questions.filter(q => q.dimension === dimension);
       let total = 0;
-      let answered = 0;
-      const questionScores = {};
-      
-      dimensionQuestions.forEach(question => {
-        if (answers[question.id]) {
-          total += answers[question.id];
-          answered++;
-          questionScores[question.id] = answers[question.id];
-        }
+      dimQuestions.forEach(question => {
+        // Se não houver resposta, atribui 1 (mínimo)
+        const ans = answers[question.id] || 1;
+        total += ans;
       });
-      
-      scores[dimension] = answered > 0 ? (total / answered).toFixed(1) : "N/A";
-      detailedScores[dimension] = {
-        average: scores[dimension],
-        answered: answered,
-        total: dimensionQuestions.length,
-        questionScores: questionScores
-      };
+      scores[dimension] = (total / dimQuestions.length).toFixed(1);
     });
-    
-    return { scores, detailedScores };
+    return scores;
   };
 
-  // Determinar o nível de maturidade com base na pontuação
+  // Determina o nível de maturidade com base na pontuação
   const getMaturityLevel = (score) => {
-    if (score === "N/A") return { level: "Indeterminado", color: "gray-400" };
-    const numScore = parseFloat(score);
-    
-    if (numScore < 1.5) return { level: "Inicial", color: "red-600" };
-    if (numScore < 2.5) return { level: "Básico", color: "orange-500" };
-    if (numScore < 3.5) return { level: "Intermediário", color: "yellow-500" };
-    if (numScore < 4.5) return { level: "Avançado", color: "blue-500" };
-    return { level: "Otimizado", color: "green-600" };
+    const num = parseFloat(score);
+    if (isNaN(num)) return { level: "Indeterminado", color: "gray" };
+    if (num < 1.5) return { level: "Inicial", color: "red" };
+    if (num < 2.5) return { level: "Básico", color: "orange" };
+    if (num < 3.5) return { level: "Intermediário", color: "yellow" };
+    if (num < 4.5) return { level: "Avançado", color: "blue" };
+    return { level: "Otimizado", color: "green" };
   };
 
-  // Obter um feedback baseado na pontuação
+  // Fornece feedback com base na pontuação
   const getFeedback = (score) => {
-    if (score === "N/A") return "Sem respostas suficientes";
     const maturity = getMaturityLevel(score);
-    
-    switch(maturity.level) {
-      case "Inicial":
-        return "Precisa de atenção urgente - Práticas ad hoc ou inexistentes";
-      case "Básico":
-        return "Em desenvolvimento - Processos básicos estabelecidos";
-      case "Intermediário":
-        return "Bom progresso - Processos bem definidos e implementados";
-      case "Avançado":
-        return "Muito bom - Processos medidos e controlados";
-      case "Otimizado":
-        return "Excelente - Melhoria contínua implementada";
-      default:
-        return "Indeterminado";
+    if (maturity.level === "Inicial") {
+      return "Precisa de atenção urgente - Práticas ad hoc ou inexistentes";
+    } else if (maturity.level === "Básico") {
+      return "Em desenvolvimento - Processos básicos estabelecidos";
+    } else if (maturity.level === "Intermediário") {
+      return "Bom progresso - Processos bem definidos e implementados";
+    } else if (maturity.level === "Avançado") {
+      return "Muito bom - Processos medidos e controlados";
+    } else if (maturity.level === "Otimizado") {
+      return "Excelente - Melhoria contínua implementada";
+    } else {
+      return "Indeterminado";
     }
   };
 
-  // Resetar o questionário
+  // Reseta o questionário
   const resetQuiz = () => {
     setAnswers({});
     setCurrentDimension("Business");
+    setCurrentQuestionIndex(0);
     setShowContactForm(false);
     setShowSummary(false);
-    setContactInfo({
-      name: "",
-      email: "",
-      company: "",
-      position: ""
-    });
+    setProgress(0);
+    setTransitionDirection("next");
+    setContactInfo({ name: "", email: "", company: "", position: "" });
     setSubmitStatus("idle");
+    setFormErrors({});
   };
 
-  // Gerar dados para gráfico de radar
+  // Prepara os dados para o gráfico de radar geral
   const prepareRadarData = (scores) => {
-    // Preparar dados para o gráfico radar
-    const radarData = dimensions.map(dimension => ({
+    return dimensions.map(dimension => ({
       subject: dimensionTranslation[dimension],
       fullMark: 5,
-      value: scores[dimension] === "N/A" ? 0 : parseFloat(scores[dimension])
-    }));
-    
-    return radarData;
-  };
-  
-  // Gerar dados para gráficos de radar específicos de dimensão
-  const prepareDimensionRadarData = (dimension, detailedScores) => {
-    const questionScores = detailedScores[dimension].questionScores;
-    const dimensionQuestions = questions.filter(q => q.dimension === dimension);
-    
-    return dimensionQuestions.map(question => ({
-      subject: `Q${question.id}`,
-      fullMark: 5,
-      value: questionScores[question.id] || 0
+      value: scores[dimension] === "N/A" ? 0 : parseFloat(scores[dimension]),
+      fill: dimensionColors[dimension]
     }));
   };
 
-  // Enviar os dados para o Formspree
+  // Envia os dados para o Formspree com validação
   const submitToFormspree = async () => {
-    // Calcular as pontuações antes de enviar
-    const { scores, detailedScores } = calculateScores();
-    const totalScore = Object.values(scores).filter(s => s !== "N/A").map(parseFloat);
-    const overallAverage = totalScore.length > 0 
-      ? (totalScore.reduce((sum, score) => sum + score, 0) / totalScore.length).toFixed(1) 
+    if (!validateContactForm()) {
+      return;
+    }
+    const scores = calculateScores();
+    const totalScore = Object.values(scores).map(parseFloat);
+    const overallAverage = totalScore.length > 0
+      ? (totalScore.reduce((sum, score) => sum + score, 0) / totalScore.length).toFixed(1)
       : "N/A";
     const overallMaturity = getMaturityLevel(overallAverage);
-    
-    // Preparar os dados para envio
     const formData = {
-      // Dados de contato
       name: contactInfo.name,
-      email: contactInfo.email || "N/A",
+      email: contactInfo.email,
       company: contactInfo.company,
       position: contactInfo.position,
-      
-      // Pontuações gerais
       overallScore: overallAverage,
       overallMaturityLevel: overallMaturity.level,
-      
-      // Pontuações por dimensão
       businessScore: scores.Business,
       businessMaturityLevel: getMaturityLevel(scores.Business).level,
-      
       dataScore: scores.Data,
       dataMaturityLevel: getMaturityLevel(scores.Data).level,
-      
       financialScore: scores.Financial,
       financialMaturityLevel: getMaturityLevel(scores.Financial).level,
-      
       ethicsScore: scores.Ethics,
       ethicsMaturityLevel: getMaturityLevel(scores.Ethics).level,
-      
-      // Respostas detalhadas para cada pergunta
       answers: JSON.stringify(answers)
     };
-    
-    // Iniciar o processo de envio
     setSubmitStatus("submitting");
-    
     try {
       const response = await fetch("https://formspree.io/f/mgvawppz", {
         method: "POST",
@@ -294,12 +255,9 @@ const AIAssessmentQuiz = () => {
         },
         body: JSON.stringify(formData)
       });
-      
       const data = await response.json();
-      
       if (response.ok) {
         setSubmitStatus("success");
-        // Mostrar os resultados após o envio bem-sucedido
         setShowSummary(true);
       } else {
         console.error("Erro ao enviar formulário:", data);
@@ -310,21 +268,65 @@ const AIAssessmentQuiz = () => {
       setSubmitStatus("error");
     }
   };
-  
-  // Exibir o formulário de contato
+
+  // Componente indicador de progresso das dimensões
+  const DimensionProgressIndicator = () => {
+    return (
+      <div className="flex justify-between items-center mb-6 bg-gray-100 p-3 rounded-lg">
+        {dimensions.map((dim, index) => {
+          const dimQuestions = questions.filter(q => q.dimension === dim);
+          const answeredQuestions = dimQuestions.filter(q => answers[q.id]);
+          const dimPercentage = (answeredQuestions.length / dimQuestions.length) * 100;
+          const isActive = dim === currentDimension;
+          return (
+            <div 
+              key={dim} 
+              className={`text-center flex-1 ${index > 0 ? "border-l border-gray-300" : ""}`}
+              aria-current={isActive ? "step" : undefined}
+            >
+              <div 
+                className={`text-sm font-semibold mb-1 ${isActive ? "text-blue-700" : "text-gray-600"}`}
+                style={{ color: isActive ? dimensionColors[dim] : "" }}
+              >
+                {dimensionTranslation[dim]}
+              </div>
+              <div className="flex justify-center">
+                <div className="w-8 h-8 relative">
+                  <CircularProgressbar
+                    value={dimPercentage}
+                    text={`${Math.round(dimPercentage)}%`}
+                    styles={buildStyles({
+                      textSize: '30px',
+                      pathColor: dimensionColors[dim],
+                      textColor: isActive ? dimensionColors[dim] : "#6B7280",
+                      trailColor: '#d1d5db'
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // -- Renderização Condicional --
+
+  // 1. Tela do formulário de contato (após o quiz, antes do resumo)
   if (showContactForm && !showSummary) {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-2 text-center">Avaliação de Prontidão para IA</h1>
-        <p className="text-center mb-6 text-gray-600">Obrigado por completar a avaliação! Para ver seus resultados, por favor preencha seus dados.</p>
-        
-        {/* Formulário de contato */}
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-center mb-6 text-gray-600">
+          Obrigado por completar a avaliação! Para ver seus resultados, por favor preencha seus dados.
+        </p>
+
+        <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
           <h2 className="text-xl font-bold mb-3">Seus Dados</h2>
           <p className="mb-4 text-sm text-gray-600">
-            Preencha seus dados para visualizar e receber seu relatório completo por e-mail.
+            Preencha seus dados para visualizar e receber seu relatório completo.
           </p>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -336,14 +338,22 @@ const AIAssessmentQuiz = () => {
                 name="name"
                 value={contactInfo.name}
                 onChange={handleContactChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                  formErrors.name ? "border-red-500 bg-red-50" : "border-gray-300"
+                }`}
+                aria-required="true"
+                aria-invalid={formErrors.name ? "true" : "false"}
+                aria-describedby={formErrors.name ? "name-error" : undefined}
               />
+              {formErrors.name && (
+                <p id="name-error" className="mt-1 text-sm text-red-600">
+                  {formErrors.name}
+                </p>
+              )}
             </div>
-            
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                E-mail
+                E-mail <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -351,10 +361,19 @@ const AIAssessmentQuiz = () => {
                 name="email"
                 value={contactInfo.email}
                 onChange={handleContactChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                  formErrors.email ? "border-red-500 bg-red-50" : "border-gray-300"
+                }`}
+                aria-required="true"
+                aria-invalid={formErrors.email ? "true" : "false"}
+                aria-describedby={formErrors.email ? "email-error" : undefined}
               />
+              {formErrors.email && (
+                <p id="email-error" className="mt-1 text-sm text-red-600">
+                  {formErrors.email}
+                </p>
+              )}
             </div>
-            
             <div>
               <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
                 Empresa <span className="text-red-500">*</span>
@@ -365,11 +384,19 @@ const AIAssessmentQuiz = () => {
                 name="company"
                 value={contactInfo.company}
                 onChange={handleContactChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                  formErrors.company ? "border-red-500 bg-red-50" : "border-gray-300"
+                }`}
+                aria-required="true"
+                aria-invalid={formErrors.company ? "true" : "false"}
+                aria-describedby={formErrors.company ? "company-error" : undefined}
               />
+              {formErrors.company && (
+                <p id="company-error" className="mt-1 text-sm text-red-600">
+                  {formErrors.company}
+                </p>
+              )}
             </div>
-            
             <div>
               <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">
                 Cargo <span className="text-red-500">*</span>
@@ -380,29 +407,50 @@ const AIAssessmentQuiz = () => {
                 name="position"
                 value={contactInfo.position}
                 onChange={handleContactChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                  formErrors.position ? "border-red-500 bg-red-50" : "border-gray-300"
+                }`}
+                aria-required="true"
+                aria-invalid={formErrors.position ? "true" : "false"}
+                aria-describedby={formErrors.position ? "position-error" : undefined}
               />
+              {formErrors.position && (
+                <p id="position-error" className="mt-1 text-sm text-red-600">
+                  {formErrors.position}
+                </p>
+              )}
             </div>
           </div>
-          
+
           <div className="mt-6">
             <button
               onClick={submitToFormspree}
-              disabled={submitStatus === "submitting" || !contactInfo.name || !contactInfo.company || !contactInfo.position}
-              className={`w-full px-4 py-2 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-                ${(submitStatus === "submitting" || !contactInfo.name || !contactInfo.company || !contactInfo.position) 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700'}`}
+              disabled={submitStatus === "submitting"}
+              className={`w-full px-4 py-3 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                submitStatus === "submitting"
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+              aria-busy={submitStatus === "submitting" ? "true" : "false"}
             >
-              {submitStatus === "submitting" ? "Processando..." : "Ver Meus Resultados"}
+              {submitStatus === "submitting" ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processando...
+                </span>
+              ) : "Ver Meus Resultados"}
             </button>
-            
+
             {submitStatus === "error" && (
-              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md" role="alert">
                 <p className="font-medium">Ocorreu um erro ao processar seus dados.</p>
-                <p className="text-sm mt-1">Por favor, tente novamente ou entre em contato com nosso suporte.</p>
-                <button 
+                <p className="text-sm mt-1">
+                  Por favor, tente novamente ou entre em contato com nosso suporte.
+                </p>
+                <button
                   onClick={() => setSubmitStatus("idle")}
                   className="mt-2 text-sm text-red-600 hover:text-red-800 font-medium"
                 >
@@ -412,437 +460,296 @@ const AIAssessmentQuiz = () => {
             )}
           </div>
         </div>
-        
+
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Ao enviar este formulário, você concorda em receber informações relacionadas à sua avaliação e outras comunicações relevantes sobre IA.</p>
+          <p>
+            Ao enviar este formulário, você concorda em receber informações relacionadas à sua avaliação e outras comunicações relevantes sobre IA.
+          </p>
         </div>
       </div>
     );
   }
 
-  // Exibir o resumo dos resultados
-  if (showSummary) {
-    const { scores, detailedScores } = calculateScores();
-    const totalScore = Object.values(scores).filter(s => s !== "N/A").map(parseFloat);
-    const overallAverage = totalScore.length > 0 
-      ? (totalScore.reduce((sum, score) => sum + score, 0) / totalScore.length).toFixed(1) 
+  // 2. Tela de Resumo (após envio do formulário)
+  else if (showSummary) {
+    const scores = calculateScores();
+    const totalScore = Object.values(scores).map(parseFloat);
+    const overallAverage = totalScore.length > 0
+      ? (totalScore.reduce((sum, score) => sum + score, 0) / totalScore.length).toFixed(1)
       : "N/A";
     const overallMaturity = getMaturityLevel(overallAverage);
-    
-    // Preparar dados para o gráfico radar
     const radarData = prepareRadarData(scores);
 
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-2 text-center">Avaliação de Prontidão para IA</h1>
-        <p className="text-center mb-6 text-gray-600">Um diagnóstico da maturidade da sua organização para implementação de IA</p>
-        
-        {/* Mensagem de confirmação de envio */}
-        <div className="mb-8 p-4 bg-green-50 rounded-lg border border-green-200">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">Dados enviados com sucesso!</h3>
-              <div className="mt-1 text-xs text-green-700">
-                <p>Suas informações foram registradas. Um relatório detalhado será enviado para {contactInfo.email}</p>
+        <p className="text-center mb-6 text-gray-600">
+          Um diagnóstico da maturidade da sua organização para implementação de IA
+        </p>
+
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+          {/* Cabeçalho com dados do usuário */}
+          <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Nome</p>
+                <p className="font-medium">{contactInfo.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">E-mail</p>
+                <p className="font-medium">{contactInfo.email}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Empresa</p>
+                <p className="font-medium">{contactInfo.company}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Cargo</p>
+                <p className="font-medium">{contactInfo.position}</p>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Pontuação geral */}
-        <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h2 className="text-xl font-bold mb-3 text-center">Pontuação Geral: {overallAverage}/5.0</h2>
-          <p className="text-center mb-4">Nível de Maturidade: <span className={`font-semibold text-${overallMaturity.color}`}>{overallMaturity.level}</span></p>
-          
-          <div className="flex justify-between items-center text-xs text-gray-500 mb-1 px-2">
+
+          <h2 className="text-xl font-bold mb-3 text-center">
+            Pontuação Geral: {overallAverage}/5.0
+          </h2>
+          <p className="text-center mb-6">
+            Nível de Maturidade:{" "}
+            <span className={`font-semibold text-${overallMaturity.color}-600`}>
+              {overallMaturity.level}
+            </span>
+          </p>
+
+          {/* Barra colorida de faixas de maturidade */}
+          <div className="flex justify-between items-center text-xs text-gray-600 mb-1 px-2">
             <span>Inicial</span>
             <span>Básico</span>
             <span>Intermediário</span>
             <span>Avançado</span>
             <span>Otimizado</span>
           </div>
-          
-          <div className="w-full h-4 bg-gray-200 rounded-full mb-4 flex">
+          <div className="w-full h-4 bg-gray-200 rounded-full mb-6 flex">
             <div className="h-full bg-red-600 rounded-l-full" style={{ width: '20%' }}></div>
             <div className="h-full bg-orange-500" style={{ width: '20%' }}></div>
             <div className="h-full bg-yellow-500" style={{ width: '20%' }}></div>
             <div className="h-full bg-blue-500" style={{ width: '20%' }}></div>
             <div className="h-full bg-green-600 rounded-r-full" style={{ width: '20%' }}></div>
           </div>
-          
-          <div className="w-full bg-gray-200 rounded-full h-6 relative mb-6">
-            <div className="absolute top-0 left-0 h-full w-full flex justify-between px-6">
-              <div className="h-full border-l border-gray-400"></div>
-              <div className="h-full border-l border-gray-400"></div>
-              <div className="h-full border-l border-gray-400"></div>
-              <div className="h-full border-l border-gray-400"></div>
+
+          {/* Gráfico Geral */}
+          <div className="mb-8 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <h3 className="text-lg font-semibold mb-4 text-center">Maturidade por Dimensão</h3>
+            <div className="max-w-md mx-auto">
+              <ScoreChart data={radarData} />
             </div>
-            <div 
-              className={`bg-${overallMaturity.color} h-6 rounded-full relative`}
-              style={{ width: overallAverage === "N/A" ? "0%" : `${(parseFloat(overallAverage) / 5) * 100}%` }}
+          </div>
+
+          {/* Tabela de pontuações por dimensão */}
+          <div className="mb-8 overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Dimensão
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Pontuação
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nível de Maturidade
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {dimensions.map(dimension => {
+                  const score = scores[dimension];
+                  return (
+                    <tr key={dimension}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: dimensionColors[dimension] }}></div>
+                          <div className="text-sm font-medium text-gray-900">{dimensionTranslation[dimension]}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 font-semibold">{score}/5.0</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-${getMaturityLevel(score).color}-100 text-${getMaturityLevel(score).color}-800`}>
+                          {getMaturityLevel(score).level}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Detalhamento por Dimensão */}
+          <div className="mb-8">
+            <h3 className="text-lg font-bold mb-4 text-center">
+              Detalhamento por Dimensão
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {dimensions.map(dimension => {
+                const score = scores[dimension];
+                const maturityLevel = getMaturityLevel(score);
+                return (
+                  <div key={dimension} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                    <h4 className="text-md font-bold mb-2" style={{ color: dimensionColors[dimension] }}>
+                      {dimensionTranslation[dimension]}
+                    </h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="text-sm text-gray-500">Pontuação</p>
+                        <p className="font-semibold">{score}/5.0</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Nível</p>
+                        <p className="font-semibold">{maturityLevel.level}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm mb-4">{getFeedback(score)}</p>
+                    <div className="bg-gray-50 p-2 rounded">
+                      <p className="text-xs text-gray-500 mb-1">
+                        Perguntas respondidas: {
+                          questions.filter(q => q.dimension === dimension && answers[q.id]).length
+                        } de {
+                          questions.filter(q => q.dimension === dimension).length
+                        }
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Botões finais: Refazer e Imprimir */}
+          <div className="flex justify-between">
+            <button
+              onClick={resetQuiz}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              <span className="absolute -right-3 -top-7 bg-white text-sm py-1 px-2 rounded shadow">
-                {overallAverage}
-              </span>
-            </div>
+              Reiniciar Avaliação
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Imprimir Relatório
+            </button>
           </div>
-        </div>
-        
-        {/* Gráfico de Radar Geral */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-center">Análise Geral por Dimensão</h2>
-          
-          <div className="flex justify-center mb-8">
-            <div className="w-full max-w-md h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart outerRadius={90} data={radarData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="subject" />
-                  <PolarRadiusAxis domain={[0, 5]} tick={{ fill: 'grey' }} />
-                  <Tooltip formatter={(value) => [value.toFixed(1), 'Pontuação']} />
-                  <Radar
-                    name="Maturidade"
-                    dataKey="value"
-                    stroke="#4338ca"
-                    fill="#4338ca"
-                    fillOpacity={0.5}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {dimensions.map(dimension => {
-              const score = scores[dimension];
-              const maturity = getMaturityLevel(score);
-              const answered = detailedScores[dimension].answered;
-              const total = detailedScores[dimension].total;
-              const dimensionRadarData = prepareDimensionRadarData(dimension, detailedScores);
-              
-              return (
-                <div key={dimension} className="border rounded-lg p-4 shadow-sm">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-lg font-medium">{dimensionTranslation[dimension] || dimension}</h3>
-                    <div className="flex items-center">
-                      <span className={`text-${maturity.color} font-bold text-xl`}>{score}</span>
-                      <span className="text-gray-400 text-sm">/5.0</span>
-                    </div>
-                  </div>
-                  
-                  {/* Gráfico de radar específico da dimensão */}
-                  <div className="h-48 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RadarChart outerRadius={60} data={dimensionRadarData}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="subject" />
-                        <PolarRadiusAxis domain={[0, 5]} tick={{ fill: 'grey' }} axisLine={false} />
-                        <Radar
-                          name={dimensionTranslation[dimension]}
-                          dataKey="value"
-                          stroke={`#${maturity.color.split('-')[1]}`}
-                          fill={`#${maturity.color.split('-')[1]}`}
-                          fillOpacity={0.5}
-                        />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </div>
-                  
-                  <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                    <div 
-                      className={`bg-${maturity.color} h-3 rounded-full`}
-                      style={{ width: score === "N/A" ? "0%" : `${(parseFloat(score) / 5) * 100}%` }}
-                    ></div>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs text-gray-500 mb-3">
-                    <span>1.0</span>
-                    <span>2.0</span>
-                    <span>3.0</span>
-                    <span>4.0</span>
-                    <span>5.0</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium">Nível: <span className={`text-${maturity.color}`}>{maturity.level}</span></p>
-                      <p className="text-xs text-gray-500">Respondeu {answered} de {total} perguntas</p>
-                    </div>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100">
-                      {Math.round((parseFloat(score) / 5) * 100)}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        
-        {/* Recomendações detalhadas */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Avaliação Detalhada e Recomendações</h2>
-          
-          <div className="space-y-6">
-            {dimensions.map(dimension => {
-              const score = scores[dimension];
-              const maturity = getMaturityLevel(score);
-              
-              let recommendations = [];
-              if (score !== "N/A") {
-                const numScore = parseFloat(score);
-                
-                if (numScore < 2.5) {
-                  switch(dimension) {
-                    case "Business":
-                      recommendations = [
-                        "Desenvolva uma estratégia clara de IA alinhada aos objetivos de negócio",
-                        "Identifique casos de uso específicos onde a IA pode gerar valor",
-                        "Estabeleça métricas para medir o sucesso das iniciativas de IA"
-                      ];
-                      break;
-                    case "Data":
-                      recommendations = [
-                        "Implemente processos de governança de dados",
-                        "Desenvolva padrões para qualidade e integridade dos dados",
-                        "Estabeleça procedimentos para lidar com dados incompletos ou inconsistentes"
-                      ];
-                      break;
-                    case "Financial":
-                      recommendations = [
-                        "Defina um orçamento específico para projetos de IA",
-                        "Estabeleça mecanismos de previsão de custos para iniciativas de IA",
-                        "Crie processos para avaliar o retorno sobre investimento em IA"
-                      ];
-                      break;
-                    case "Ethics":
-                      recommendations = [
-                        "Estabeleça princípios éticos para o desenvolvimento de IA",
-                        "Implemente mecanismos para identificar e mitigar vieses",
-                        "Desenvolva processos para garantir transparência nas decisões baseadas em IA"
-                      ];
-                      break;
-                  }
-                } else if (numScore < 3.5) {
-                  switch(dimension) {
-                    case "Business":
-                      recommendations = [
-                        "Refine a estratégia de IA para melhor alinhamento com objetivos de longo prazo",
-                        "Expanda os casos de uso para áreas adicionais do negócio",
-                        "Aprimore as métricas de sucesso para capturar impactos indiretos"
-                      ];
-                      break;
-                    case "Data":
-                      recommendations = [
-                        "Fortaleça os processos de validação de dados",
-                        "Melhore a integração entre diferentes fontes de dados",
-                        "Implemente técnicas avançadas de análise de qualidade de dados"
-                      ];
-                      break;
-                    case "Financial":
-                      recommendations = [
-                        "Desenvolva modelos mais sofisticados de previsão de custos",
-                        "Estabeleça fundos de contingência para projetos de IA",
-                        "Refine os métodos de avaliação de ROI para projetos de longo prazo"
-                      ];
-                      break;
-                    case "Ethics":
-                      recommendations = [
-                        "Expanda as avaliações de impacto ético para todos os projetos de IA",
-                        "Desenvolva métodos mais robustos para detecção e mitigação de vieses",
-                        "Implemente processos de auditoria ética para sistemas existentes"
-                      ];
-                      break;
-                  }
-                }
-              }
-              
-              return (
-                <div key={`detail-${dimension}`} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-lg font-medium mb-2">{dimensionTranslation[dimension] || dimension}</h3>
-                  <p className="mb-3">
-                    <span className={`inline-block px-2 py-1 rounded text-white text-sm bg-${maturity.color} mr-2`}>
-                      {maturity.level}
-                    </span>
-                    <span className="text-gray-700">{getFeedback(score)}</span>
-                  </p>
-                  
-                  {recommendations.length > 0 && (
-                    <div>
-                      <p className="font-medium mb-1">Recomendações:</p>
-                      <ul className="list-disc pl-5 space-y-1 text-sm">
-                        {recommendations.map((rec, index) => (
-                          <li key={index}>{rec}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        
-        {/* Botões finais */}
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={resetQuiz}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Reiniciar Avaliação
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Imprimir Relatório
-          </button>
         </div>
       </div>
     );
   }
 
-  // Exibir o questionário
+  // 3. Tela do questionário (fluxo principal)
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-2 text-center">Avaliação de Prontidão para IA</h1>
-      
-      {/* Barra de progresso global */}
+      <p className="text-center mb-6 text-gray-600">
+        Um diagnóstico da maturidade da sua organização para implementação de IA
+      </p>
+
+      {/* Barra de progresso geral */}
       <div className="mb-4">
-        <div className="flex justify-between text-xs text-gray-500 mb-1">
-          <span>Progresso geral</span>
+        <div className="flex justify-between items-center text-xs text-gray-600 mb-1">
+          <span>Progresso</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          ></div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
         </div>
       </div>
-      
-      {/* Tabs para as dimensões */}
-      <div className="flex mb-6 border-b">
-        {dimensions.map((dim, index) => (
-          <button
-            key={dim}
-            onClick={() => setCurrentDimension(dim)}
-            className={`py-2 px-4 font-medium text-sm transition-colors relative ${
-              currentDimension === dim 
-                ? 'text-blue-600' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {dim}
-            {currentDimension === dim && (
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
-            )}
-          </button>
-        ))}
-      </div>
-      
-      <h2 className="text-xl font-medium mb-6 text-blue-600">
-        {currentDimension === "Business" && "Estratégia de Negócios"}
-        {currentDimension === "Data" && "Gestão de Dados"}
-        {currentDimension === "Financial" && "Planejamento Financeiro"}
-        {currentDimension === "Ethics" && "Ética e Impacto Social"}
-      </h2>
-      
-      <div className="space-y-6 mb-8">
-        {filteredQuestions.map(question => {
-          // Calcular o índice da pergunta dentro da sua dimensão
-          const questionIndex = questions
-            .filter(q => q.dimension === question.dimension)
-            .findIndex(q => q.id === question.id);
-            
-          return (
-            <div key={question.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex items-start mb-3">
-                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
-                  {questionIndex + 1}
-                </span>
-                <p className="font-medium">{question.text}</p>
-              </div>
-              
-              <div className="grid grid-cols-5 gap-2">
-                {options.map(option => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleAnswer(question.id, option.value)}
-                    className={`p-2 rounded-lg text-sm transition-colors ${
-                      answers[question.id] === option.value
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-              
-              {answers[question.id] && (
-                <div className="mt-2 text-right">
-                  <span className="text-xs text-gray-500">
-                    {answers[question.id] < 3 ? 'Oportunidade de melhoria' : 
-                     answers[question.id] < 4 ? 'Nível adequado' : 'Ponto forte'}
-                  </span>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      
-      <div className="flex justify-between">
-        <button
-          onClick={prevDimension}
-          disabled={currentDimension === dimensions[0]}
-          className={`px-5 py-2 rounded-lg flex items-center ${
-            currentDimension === dimensions[0]
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-gray-600 text-white hover:bg-gray-700'
-          } transition-colors`}
+
+      {/* Indicador de progresso por dimensão */}
+      <DimensionProgressIndicator />
+
+      {/* Título da dimensão atual */}
+      <div className="mb-4 text-center">
+        <h2 
+          className="text-xl font-bold"
+          style={{ color: dimensionColors[currentDimension] }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Anterior
-        </button>
-        
-        <button
-          onClick={nextDimension}
-          className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          {currentDimension === dimensions[dimensions.length - 1] ? 'Ver Resultados' : 'Próximo'}
-          {currentDimension !== dimensions[dimensions.length - 1] && (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          )}
-        </button>
-      </div>
-      
-      <div className="mt-6 flex justify-center">
-        <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg">
-          <span className="text-sm text-gray-700 mr-2">
-            Dimensão {dimensions.indexOf(currentDimension) + 1} de {dimensions.length}
-          </span>
-          <div className="w-16 bg-gray-300 rounded-full h-1.5">
-            <div 
-              className="bg-blue-600 h-1.5 rounded-full"
-              style={{ width: `${((dimensions.indexOf(currentDimension) + 1) / dimensions.length) * 100}%` }}
-            ></div>
+          {dimensionTranslation[currentDimension]}
+        </h2>
+        <div className="flex items-center justify-center mt-2">
+          <div className="w-12 h-12">
+            <CircularProgressbar
+              value={dimensionProgress}
+              text={`${currentQuestionIndex + 1}/${filteredQuestions.length}`}
+              styles={buildStyles({
+                textSize: '30px',
+                pathColor: dimensionColors[currentDimension],
+                textColor: dimensionColors[currentDimension],
+                trailColor: '#d1d5db'
+              })}
+            />
           </div>
         </div>
+      </div>
+
+      {/* Bloco de pergunta */}
+      <div className={`mb-6 transition-all duration-300 ${
+        animating 
+          ? transitionDirection === "next" 
+            ? "opacity-0 transform translate-x-full" 
+            : "opacity-0 transform -translate-x-full"
+          : "opacity-100 transform translate-x-0"
+      }`}>
+        <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold mb-4">
+            {currentQuestion?.text}
+          </h3>
+          <div className="space-y-3">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleAnswer(currentQuestion?.id, option.value)}
+                className={`w-full p-3 flex items-center justify-between rounded-lg transition-all ${
+                  answers[currentQuestion?.id] === option.value
+                    ? "bg-blue-600 text-white"
+                    : "bg-white hover:bg-gray-100"
+                } border border-gray-200 shadow-sm`}
+              >
+                <span className="font-medium">{option.label}</span>
+                <span className={`w-6 h-6 flex items-center justify-center rounded-full ${
+                  answers[currentQuestion?.id] === option.value 
+                    ? "bg-white text-blue-600" 
+                    : `bg-${option.color}-100 text-${option.color}-600`
+                }`}>
+                  {option.value}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Botões de navegação */}
+      <div className="flex justify-between">
+        <button
+          onClick={prevQuestion}
+          disabled={currentDimension === "Business" && currentQuestionIndex === 0}
+          className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+            currentDimension === "Business" && currentQuestionIndex === 0
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          Anterior
+        </button>
+        <button
+          onClick={nextQuestion}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Próxima
+        </button>
       </div>
     </div>
   );
 };
 
-/* The above code is a JavaScript code snippet that is exporting a component or module named
-`AIAssessmentQuiz`. This code is using ES6 syntax for exporting a default module. */
 export default AIAssessmentQuiz;
